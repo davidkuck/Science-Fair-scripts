@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AISpawner : MonoBehaviour
+public class AI_spawner : MonoBehaviour
 {
     public GameObject objectToDuplicate; // The object you want to duplicate.
     public int numberOfDuplicates = 100; // Number of duplicates to create.

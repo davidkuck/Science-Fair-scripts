@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class crab_Behavior : MonoBehaviour
+public class AI_Behavior : MonoBehaviour
 {
     public int numRays = 36; // Number of rays to cast in a circle
     public float maxRayDistance = 10f;
@@ -102,7 +101,7 @@ public class crab_Behavior : MonoBehaviour
         FB = outputsFromNN[0];
         LR = outputsFromNN[1];
 
-        movement.Move(FB, LR;)
+        movement.Move(FB, LR);
     }
 
     void Rays_update()
@@ -145,7 +144,7 @@ public class crab_Behavior : MonoBehaviour
     private void OnTriggerEnter2D(Collision2D col)
     {
         // Check if the collision involves the object you want to decrease the variable.
-        if (collision.gameObject.CompareTag(foodTag) && canEat))
+        if (collision.gameObject.CompareTag(foodTag) && canEat)
         {
             Debug.Log("it works");
             currentEnergy += energyGained;
@@ -182,12 +181,9 @@ public class crab_Behavior : MonoBehaviour
 
         // Starve
         if (energy <= 0)
-        {
-            this.transform.Rotate(0, 0, 180);
-            Destroy(this.gameObject, 3);
+        {            
             GetComponent<Movement>().enabled = false;
         }
-    }
     }
     // Method to update the health and size externally
     public void SetHealth(float newHealth)
@@ -217,4 +213,3 @@ public class crab_Behavior : MonoBehaviour
     }
 
 }
-

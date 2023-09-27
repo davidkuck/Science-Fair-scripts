@@ -1,13 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-//using NN;
-//using System;
-// using MathNet.Numerics;
-// using MathNet.Numerics.LinearAlgebra;
 
-public class Movement : MonoBehaviour
+public class AI_movement : MonoBehaviour
 {
     public CharacterController controller;
     private bool hasController = false;

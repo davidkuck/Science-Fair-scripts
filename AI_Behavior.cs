@@ -9,14 +9,9 @@ public class AI_Behavior : MonoBehaviour
     public float[] distances = new float[36];
     public string foodTag = "Food"; // Tag of the player object
     private Color hitPlayerColor = Color.red;
-    private Color hitOtherColor = Color.green;
+    private Color hitFoodColor = Color.green;
+    private Color hitNothingColor = Color.grey;
 
-    public Transform healthBar; // Reference to the child object's transform
-    public float maxHealth = 100f; // Maximum health value
-    public float currentHealth = 100f; // Current health value
-    public int attackAmount;
-    private float previousHealth; 
-    private Vector3 initialScaleHealth; // Initial scale of the health bar
 
     public bool canEat = true;
     public bool mutateMutations = true;
@@ -28,12 +23,15 @@ public class AI_Behavior : MonoBehaviour
     public float lifeSpan = 0f;
     public bool isDead = false;
 
-    public Transform energyBar; // Reference to the child object's transform
+    public float maxHealth = 100f; // Maximum health value
+    public float currentHealth = 100f; // Current health value
+    public int attackAmount;
+    private float previousHealth; 
+
     public float maxEnergy = 100f; // Maximum health value
     public float currentEnergy = 100f; // Current health value
     private float energyGained = 25f;
     private float previousEnergy; 
-    private Vector3 initialScaleEnergy; // Initial scale of the health bar
     
 
     public float mutationAmount = 0.8f;
@@ -50,9 +48,6 @@ public class AI_Behavior : MonoBehaviour
         previousHealth = currentHealth;
         previousEnergy = currentEnergy;
 
-        // Get the initial scale of the bars
-        initialScaleHealth = healthBar.localScale;
-        initialScaleEnergy = energyBar.localScale;
 
         nn = gameObject.GetComponent<NN>();
         movement = gameObject.GetComponent<Movement>();
@@ -60,8 +55,6 @@ public class AI_Behavior : MonoBehaviour
 
         this.name = "Agent";
 
-        // Set the initial size based on the current health
-        UpdateSizeEnergy();
 
         hostCollider = GetComponent<Collider2D>(); // Assuming the collider is attached to the same GameObject
 
@@ -73,10 +66,6 @@ public class AI_Behavior : MonoBehaviour
         // Check if the energy has changed
         if (currentEnergy != previousEnergy)
         {
-            Debug.Log($"it works");
-            // Update the size of the health bar
-            UpdateSizeEnergy();
-
             // Update the previous health value
             previousEnergy = currentEnergy;
         }
@@ -104,41 +93,6 @@ public class AI_Behavior : MonoBehaviour
         movement.Move(FB, LR);
     }
 
-    void Rays_update()
-    {
-        for (int i = 0; i < numRays; i++)
-        {
-            float angle = i * 360f / numRays;
-            Vector2 direction = Quaternion.Euler(0, 0, angle) * Vector2.right;
-
-            Vector3 rayStart = hostCollider.bounds.center + (Vector3)direction * (hostCollider.bounds.extents.x + 0.01f);
-            RaycastHit2D hit = Physics2D.Raycast(rayStart, direction, maxRayDistance);
-
-            
-
-            Vector3 rayEnd = hit.collider ? hit.point : (Vector2)rayStart + direction * maxRayDistance;
-
-            if (hit.collider != null)
-            {
-                if (hit.collider.CompareTag(foodTag))
-                {
-                    Debug.DrawLine(rayStart, rayEnd, hitPlayerColor);
-                    // Use the length of the raycast as the distance to the food object
-                    distances[i] = hit.distance / viewDistance;
-                }
-                else
-                {
-                    Debug.DrawLine(rayStart, rayEnd, hitOtherColor);
-                    distances[i] = maxRayDistance;
-                }
-            }
-            else
-            {
-                Debug.DrawLine(rayStart, rayEnd, Color.white);
-                distances[i] = maxRayDistance; 
-            }
-        }
-    }
 
 
     private void OnTriggerEnter2D(Collision2D col)
@@ -158,15 +112,48 @@ public class AI_Behavior : MonoBehaviour
 
                 
             }
-
-            // Calculate the new size based on the current health
-            float newSizeHealth = Mathf.Clamp01(currentEnergy / maxEnergy);
-
-            // Apply the new size to the health bar's scale, taking initial scale into account
-            energyBar.localScale = new Vector3(initialScaleHealth.x * newSize, initialScaleEnergy.y, initialScaleEnergy.z);            }
+        }
     
     }
-    public void ManageEnergy()
+
+    void Rays_update()
+    {
+        for (int i = 0; i < numRays; i++)
+        {
+            float angle = i * 360f / numRays;
+            Vector2 direction = Quaternion.Euler(0, 0, angle) * Vector2.right;
+
+            Vector3 rayStart = hostCollider.bounds.center + (Vector3)direction * (hostCollider.bounds.extents.x + 0.01f);
+            RaycastHit2D hit = Physics2D.Raycast(rayStart, direction, maxRayDistance);
+
+            
+
+            Vector3 rayEnd = hit.collider ? hit.point : (Vector2)rayStart + direction * maxRayDistance;
+
+            if (hit.collider != null)
+            {
+                if (hit.collider.CompareTag(foodTag))
+                {
+                    Debug.DrawLine(rayStart, rayEnd, hitFoodColor);
+                    // Use the length of the raycast as the distance to the food object
+                    distances[i] = hit.distance / viewDistance;
+                }
+                else
+                {
+                    Debug.DrawLine(rayStart, rayEnd, hitPlayerColor);
+                    // it is negative so that the NN knows it is a player
+                    distances[i] = (hit.distance / viewDistance) *-1;
+                }
+            }
+            else
+            {
+                Debug.DrawLine(rayStart, rayEnd, Color.white);
+                distances[i] = maxRayDistance; 
+            }
+        }
+    }
+
+    void ManageEnergy()
     {
         elapsed += Time.deltaTime;
         lifeSpan += Time.deltaTime;
@@ -176,40 +163,58 @@ public class AI_Behavior : MonoBehaviour
 
             // Subtract 1 energy per second
             energy -= 1f;
+            
 
         }
 
         // Starve
         if (energy <= 0)
-        {            
+        {           
+            Destroy(this.gameObject,3); 
             GetComponent<Movement>().enabled = false;
         }
     }
-    // Method to update the health and size externally
-    public void SetHealth(float newHealth)
+    void MutateCreature()
     {
-        currentHealth = Mathf.Clamp(newHealth, maxHealth, 0f);
-        // Calculate the new size based on the current health
-        float newSize = Mathf.Clamp01(currentHealth / maxHealth);
+        if(mutateMutations)
+        {
+            mutationAmount += Random.Range(-1.0f, 1.0f)/100;
+            mutationChance += Random.Range(-1.0f, 1.0f)/100;
+        }
 
-        // Apply the new size to the health bar's scale, taking initial scale into account
-        healthBar.localScale = new Vector3(initialScaleHealth.x * newSize, initialScaleHealth.y, initialScaleHealth.z);
+        //make sure mutation amount and chance are positive using max function
+        mutationAmount = Mathf.Max(mutationAmount, 0);
+        mutationChance = Mathf.Max(mutationChance, 0);
+
+        nn.MutateNetwork(mutationAmount, mutationChance);
     }
-       // Update the size of the child object based on the current health
-    private void UpdateSizeEnergy()
+    void Reproduce()
     {
-        // Calculate the new size based on the current health
-        float newSize = Mathf.Clamp01(currentEnergy / maxEnergy);
+        if (currentEnergy >= 25f)
+        {
+            numberOfChildren = 2;
+        }
+            
+        else
+        {
+            numberOfChildren = 1;
+        }
+            
+        //replicate
+        for (int i = 0; i< numberOfChildren; i ++) // I left this here so I could possibly change the number of children a parent has at a time.
+        {
+            //create a new agent, and set its position to the parent's position + a random offset in the x and z directions (so they don't all spawn on top of each other)
+            GameObject child = Instantiate(agentPrefab, new Vector3(
+                (float)this.transform.position.x + Random.Range(-10, 11), 
+                0, 
+                (float)this.transform.position.z+ Random.Range(-10, 11)), 
+                Quaternion.identity);
+            
+            //copy the parent's neural network to the child
+            child.GetComponent<NN>().layers = GetComponent<NN>().copyLayers();
+        }
+    Destroy(this.gameObject,3); 
+    GetComponent<Movement>().enabled = false;
 
-        // Apply the new size to the health bar's scale, taking initial scale into account
-        energyBar.localScale = new Vector3(initialScaleEnergy.x * newSize, initialScaleEnergy.y, initialScaleEnergy.z);
     }
-
-    // Method to update the health and size externally
-    public void SetEnergy(float newEnergy)
-    {
-        currentEnergy = Mathf.Clamp(newEnergy, maxEnergy, 0f);
-        UpdateSizeEnergy();
-    }
-
 }

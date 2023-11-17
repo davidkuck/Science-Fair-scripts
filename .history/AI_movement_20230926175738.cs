@@ -10,8 +10,8 @@ public class AI_movement : MonoBehaviour
     private Vector3 playerVelocity;
     public float speed = 10.0F;
     public float rotateSpeed = 10.0F;
-    public float YMovement = 0;
-    public float XMovement = 0;
+    public float FB = 0;
+    public float LR = 0;
 
     private ObjectTracker objectTracker;
     private Creature creature;
@@ -25,10 +25,9 @@ public class AI_movement : MonoBehaviour
 
     public void Move(float FB, float LR)
     {
-        //clamp the values of X and Y       
-        FB = Mathf.Clamp(FB, -0.3, 1);
-        LR = Mathf.Clamp(Lr, -1, 1);
-
+        //clamp the values of LR and FB
+        LR = Mathf.Clamp(LR, -1, 1);
+        FB = Mathf.Clamp(FB, 0, 1);
 
         //move the agent
         if (!creature.isDead)

@@ -15,8 +15,8 @@ public class AI_Behavior : MonoBehaviour
 
     public bool canEat = true;
     public bool mutateMutations = true;
-    public float YMovement = 0;
-    public float XMovement = 0;
+    public float FB = 0;
+    public float LR = 0;
     public int numberOfChildren = 1;
     private bool isMutated = false;
     float elapsed = 0f;
@@ -118,48 +118,39 @@ public class AI_Behavior : MonoBehaviour
 
     void Rays_update()
     {
-    // Define the number of object classes, e.g., food and player
-    int numObjectClasses = 2;
-
-    for (int i = 0; i < numRays; i++)
-    {
-        float angle = i * 360f / numRays;
-        Vector2 direction = Quaternion.Euler(0, 0, angle) * Vector2.right;
-
-        Vector3 rayStart = hostCollider.bounds.center + (Vector3)direction * (hostCollider.bounds.extents.x + 0.01f);
-        RaycastHit2D hit = Physics2D.Raycast(rayStart, direction, maxRayDistance);
-
-        Vector3 rayEnd = hit.collider ? hit.point : (Vector2)rayStart + direction * maxRayDistance;
-
-        double[] inputVector = new double[1 + numObjectClasses]; // Input vector
-
-        if (hit.collider != null)
+        for (int i = 0; i < numRays; i++)
         {
-            if (hit.collider.CompareTag(foodTag))
+            float angle = i * 360f / numRays;
+            Vector2 direction = Quaternion.Euler(0, 0, angle) * Vector2.right;
+
+            Vector3 rayStart = hostCollider.bounds.center + (Vector3)direction * (hostCollider.bounds.extents.x + 0.01f);
+            RaycastHit2D hit = Physics2D.Raycast(rayStart, direction, maxRayDistance);
+
+            
+
+            Vector3 rayEnd = hit.collider ? hit.point : (Vector2)rayStart + direction * maxRayDistance;
+
+            if (hit.collider != null)
             {
-                Debug.DrawLine(rayStart, rayEnd, hitFoodColor);
-                // Use the length of the raycast as the distance to the food object
-                inputVector[0] = hit.distance / maxRayDistance; // Distance
-                inputVector[1] = 1.0; // Food identification
+                if (hit.collider.CompareTag(foodTag))
+                {
+                    Debug.DrawLine(rayStart, rayEnd, hitFoodColor);
+                    // Use the length of the raycast as the distance to the food object
+                    distances[i] = hit.distance / viewDistance;
+                }
+                else
+                {
+                    Debug.DrawLine(rayStart, rayEnd, hitPlayerColor);
+                    // it is negative so that the NN knows it is a player
+                    distances[i] = (hit.distance / viewDistance) *-1;
+                }
             }
             else
             {
-                Debug.DrawLine(rayStart, rayEnd, hitPlayerColor);
-
-                inputVector[0] = hit.distance / maxRayDistance; // Distance
-                inputVector[2] = 1.0; // Player identification
+                Debug.DrawLine(rayStart, rayEnd, Color.white);
+                distances[i] = maxRayDistance; 
             }
         }
-        else
-        {
-            Debug.DrawLine(rayStart, rayEnd, Color.white);
-            inputVector[0] = 1.0; // Maximum distance (normalized)
-        }
-
-        // Store the input vector for this ray in the 'inputVectors' list or array.
-        // You can use a list or array to collect all input vectors for later processing with your neural network.
-        inputVectors[i] = inputVector;
-    }
     }
 
     void ManageEnergy()

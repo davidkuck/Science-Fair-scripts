@@ -7,11 +7,10 @@ public class RoundCounter : MonoBehaviour
     public GameObject[] foodList;
     public GameObject[] agentList;
     public GameObject[] enemyList;
-    List<float> foodData = new List<float>();
-    List<float> agentData = new List<float>();
-    List<float> enemyData = new List<float>();
     
-    private int currentRound = 1;    
+    private int currentRound = 1;
+    private str Data = "";
+    
     float time = 0;
 
     // Initialize the round counter text
@@ -39,7 +38,7 @@ public class RoundCounter : MonoBehaviour
         {
             Data = "";
             // Log data or perform actions based on the value of currentRound
-            Debug.Log("Logging data for current round: Food = " + foodData + "Agents = " + agentData + "Enemy = " + enemyData);
+            Debug.Log("Logging data for current round: Food = " + foodData "Agents = " +agentData "Enemy = " + enemyData);
         }
     }
 

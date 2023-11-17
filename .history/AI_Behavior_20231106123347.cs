@@ -16,7 +16,7 @@ public class AI_Behavior : MonoBehaviour
     public bool canEat = true;
     public bool mutateMutations = true;
     public float YMovement = 0;
-    public float XMovement = 0;
+    public float XMovement  = 0;
     public int numberOfChildren = 1;
     private bool isMutated = false;
     float elapsed = 0f;
@@ -146,7 +146,7 @@ public class AI_Behavior : MonoBehaviour
             {
                 Debug.DrawLine(rayStart, rayEnd, hitPlayerColor);
 
-                inputVector[0] = hit.distance / maxRayDistance; // Distance
+                inputVector[0] = -hit.distance / maxRayDistance; // Distance
                 inputVector[2] = 1.0; // Player identification
             }
         }

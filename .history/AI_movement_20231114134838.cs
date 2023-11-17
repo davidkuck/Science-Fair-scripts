@@ -23,11 +23,11 @@ public class AI_movement : MonoBehaviour
         controller = GetComponent<CharacterController>();
     }
 
-    public void Move(float FB, float LR)
+    public void Move(float Y, float X)
     {
-        //clamp the values of X and Y       
-        FB = Mathf.Clamp(FB, -0.3, 1);
-        LR = Mathf.Clamp(Lr, -1, 1);
+        //clamp the values of LR and FB        
+        Y = Mathf.Clamp(Y, -1, 1);
+        X = Mathf.Clamp(X, -1, 1);
 
 
         //move the agent

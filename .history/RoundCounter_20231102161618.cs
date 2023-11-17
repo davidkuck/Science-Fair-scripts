@@ -11,7 +11,9 @@ public class RoundCounter : MonoBehaviour
     List<float> agentData = new List<float>();
     List<float> enemyData = new List<float>();
     
-    private int currentRound = 1;    
+    private int currentRound = 1;
+    private str Data = "";
+    
     float time = 0;
 
     // Initialize the round counter text

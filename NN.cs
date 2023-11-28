@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class NN : MonoBehaviour
 {
-    int [] networkShape = {36,24, 24, 2};
+    int [] networkShape = {36,24,24,3};
     public Layer [] layers;
 
     // Awake is called when the script instance is being loaded.
@@ -24,13 +24,14 @@ public class NN : MonoBehaviour
     }
 
     //This function is used to feed forward the inputs through the network, and return the output, which is the decision of the network, in this case, the direction to move in.
-    public float[] Brain(float [] inputs)
+    public float[] Brain(float [] flattenedInput)
     {
+
         for(int i = 0; i < layers.Length; i++)
         {
             if(i == 0)
             {
-                layers[i].Forward(inputs);
+                layers[i].Forward(flattenedInput);
                 layers[i].Activation();
             } 
             else if(i == layers.Length - 1)
@@ -50,6 +51,11 @@ public class NN : MonoBehaviour
     //This function is used to copy the weights and biases from one neural network to another.
     public Layer[] copyLayers()
     {
+        if (layers == null)
+        {
+            Debug.Log("it is null");
+
+        }
         Layer[] tmpLayers = new Layer[networkShape.Length - 1];
         for(int i = 0; i < layers.Length; i++)
         {

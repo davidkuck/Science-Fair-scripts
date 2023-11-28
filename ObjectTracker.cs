@@ -2,18 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RoundCounter : MonoBehaviour
+public class ObjectTracker: MonoBehaviour
 {
     public GameObject[] foodList;
     public GameObject[] agentList;
     public GameObject[] enemyList;
-    List<float> foodData = new List<float>();
-    List<float> agentData = new List<float>();
-    List<float> enemyData = new List<float>();
+    private int creatureCount = 0;
+    private int foodCount = 0;
+    private int enemyCount = 0;
     
     private int currentRound = 1;    
-    float time = 0;
+    private float time = 0f;
+    private float RoundLength = 10f;
 
+
+
+    public AI_behaviour creature;
+    public FoodSpawner FoodSpawner;
     // Initialize the round counter text
     void Start()
     {
@@ -23,7 +28,7 @@ public class RoundCounter : MonoBehaviour
     // Update the round counter text
     void UpdateRoundCounter()
     {
-        Debug.Log("Iteration: " + currentRound); 
+        
         if (currentRound == 1 ||
             currentRound == 10 ||
             currentRound == 100 ||
@@ -37,9 +42,9 @@ public class RoundCounter : MonoBehaviour
             currentRound == 10000 ||
             currentRound == 20000)
         {
-            Data = "";
+            Debug.Log("Iteration: " + currentRound); 
             // Log data or perform actions based on the value of currentRound
-            Debug.Log("Logging data for current round: Food = " + foodData + "Agents = " + agentData + "Enemy = " + enemyData);
+            Debug.Log("Logging data for current round: Food = " + foodCount + "Agents = " + creatureCount + "Enemy = " + enemyCount);
         }
     }
 
@@ -48,26 +53,27 @@ public class RoundCounter : MonoBehaviour
     {
         currentRound++;
         UpdateRoundCounter();
-        AI_Behavior.Reproduce();
-        FoodSpawner.FoodSpawn();
+        creature.Reproduce(ref creatureCount);
+
+        FoodSpawner.FoodSpawn(ref foodCount);
     }
 
     private void FixedUpdate()
     {
         time+=Time.fixedDeltaTime;
-        foodList = GameObject.FindGameObjectsWithTag("Food");
-        agentList = GameObject.FindGameObjectsWithTag("Agent");
-        enemyList = GameObject.FindGameObjectsWithTag("Enemy");
+
         //if time save data point
-        if(time > 100)
+        if(time >= RoundLength)
         {
-            
-            foodData.Add(foodList.Length);
-            agentData.Add(agentList.Length);
-            enemyData.Add(enemyList.Length);
+            time = 0f;
+
+
+            foodList = GameObject.FindGameObjectsWithTag("Food");
+            agentList = GameObject.FindGameObjectsWithTag("Creature");
+            enemyList = GameObject.FindGameObjectsWithTag("Enemy");
             IncrementRound();
             
-            time = 0;
+             
         }
     }
 }

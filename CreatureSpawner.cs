@@ -2,16 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AI_spawner : MonoBehaviour
+public class CreatureSpawner : MonoBehaviour
 {
     public GameObject objectToDuplicate; // The object you want to duplicate.
-    public int numberOfDuplicates = 100; // Number of duplicates to create.
-    public Vector2 mapSize = new Vector2(50f, 50f); // The size of the designated map area.
+    public int InitialCreatureCount = 100; // Number of duplicates to create.
+    public Vector2 mapSize = new Vector2(60f, 40f); // The size of the designated map area.
 
     void Start()
     {
         // Create duplicates
-        for (int i = 0; i < numberOfDuplicates; i++)
+        for (int i = 0; i < InitialCreatureCount; i++)
         {
             // Generate random position within the map bounds
             Vector3 randomPosition = new Vector3(

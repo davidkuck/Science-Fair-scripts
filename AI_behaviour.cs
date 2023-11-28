@@ -207,10 +207,9 @@ public class AI_behaviour : MonoBehaviour
 
         nn.MutateNetwork(mutationAmount, mutationChance);
     }
-    public void Reproduce(ref int creatureCount)
+    public void Reproduce()
     {
         
-        creatureCount = 0;  
         if (currentEnergy >= 25f)
         {
             numberOfChildren = 2;
@@ -223,7 +222,6 @@ public class AI_behaviour : MonoBehaviour
             
         for (int j = 0; j < numberOfChildren; j++)
         {
-            creatureCount++;
             // Ensure agentList[i] is not null and it has a valid transform
             if (this.gameObject != null && this.transform != null)
             {
@@ -235,8 +233,7 @@ public class AI_behaviour : MonoBehaviour
                         this.transform.position.x + Random.Range(-10, 11),
                         this.transform.position.y + Random.Range(-10, 11),
                         0), Quaternion.identity);
-                    //copy the parent's neural network to the child
-                    child.GetComponent<NN>().layers = GetComponent<NN>().copyLayers();
+
                 }
                 else
                 {

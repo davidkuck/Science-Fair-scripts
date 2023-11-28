@@ -1,33 +1,47 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
+using System.Threading;
+
 
 public class ObjectTracker: MonoBehaviour
 {
     public GameObject[] foodList;
     public GameObject[] agentList;
     public GameObject[] enemyList;
-    private int creatureCount = 0;
-    private int foodCount = 0;
-    private int enemyCount = 0;
+
     
-    private int currentRound = 1;    
+    private int currentRound = 0;    
     private float time = 0f;
     private float RoundLength = 10f;
 
+    private string logFilePath = "Assets/simulation_log.txt"; // Path to your log file
+    private int[] info = new int[3];
 
 
-    public AI_behaviour creature;
     public FoodSpawner FoodSpawner;
+    public Enemy_behaviour enemy;
+    public AI_behaviour creature;
+
     // Initialize the round counter text
     void Start()
     {
-        UpdateRoundCounter();
+
+        IncrementRound();
     }
 
     // Update the round counter text
     void UpdateRoundCounter()
     {
+        info[0] = foodList.Length;
+        info[1] = agentList.Length;
+        info[2] = enemyList.Length;
+        using (StreamWriter writer = File.AppendText(logFilePath))
+        {
+            writer.WriteLine("iteraton:" + currentRound);
+            writer.WriteLine("Logging data for current round: Food = " + info[0] + " Agents = " + info[1] + " Enemy = " + info[2]);
+        }
         
         if (currentRound == 1 ||
             currentRound == 10 ||
@@ -44,7 +58,7 @@ public class ObjectTracker: MonoBehaviour
         {
             Debug.Log("Iteration: " + currentRound); 
             // Log data or perform actions based on the value of currentRound
-            Debug.Log("Logging data for current round: Food = " + foodCount + "Agents = " + creatureCount + "Enemy = " + enemyCount);
+            Debug.Log("Logging data for current round: Food = " + info[0] + " Agents = " + info[1] + " Enemy = " + info[2]);
         }
     }
 
@@ -52,10 +66,16 @@ public class ObjectTracker: MonoBehaviour
     public void IncrementRound()
     {
         currentRound++;
+        foodList = GameObject.FindGameObjectsWithTag("Food");
+        agentList = GameObject.FindGameObjectsWithTag("Creature");
+        enemyList = GameObject.FindGameObjectsWithTag("Enemy");
+        Debug.Log(enemyList.Length);
+        
         UpdateRoundCounter();
-        creature.Reproduce(ref creatureCount);
+        creature.Reproduce();
+        FoodSpawner.FoodSpawn();
+        enemy.Reproduce();
 
-        FoodSpawner.FoodSpawn(ref foodCount);
     }
 
     private void FixedUpdate()
@@ -68,9 +88,7 @@ public class ObjectTracker: MonoBehaviour
             time = 0f;
 
 
-            foodList = GameObject.FindGameObjectsWithTag("Food");
-            agentList = GameObject.FindGameObjectsWithTag("Creature");
-            enemyList = GameObject.FindGameObjectsWithTag("Enemy");
+
             IncrementRound();
             
              

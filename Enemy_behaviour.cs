@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class NewBehaviourScript : MonoBehaviour
+public class Enemy_behaviour : MonoBehaviour
 {
     public int numRays = 36; // Number of rays to cast in a circle
     public float maxRayDistance = 10f;
@@ -210,10 +210,9 @@ public class NewBehaviourScript : MonoBehaviour
 
         nn.MutateNetwork(mutationAmount, mutationChance);
     }
-    public void Reproduce(ref int creatureCount)
+    public void Reproduce()
     {
         
-        creatureCount = 0;  
         if (currentEnergy >= 25f)
         {
             numberOfChildren = 2;
@@ -226,7 +225,6 @@ public class NewBehaviourScript : MonoBehaviour
             
         for (int j = 0; j < numberOfChildren; j++)
         {
-            creatureCount++;
             // Ensure agentList[i] is not null and it has a valid transform
             if (this.gameObject != null && this.transform != null)
             {

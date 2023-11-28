@@ -16,12 +16,10 @@ public class Movement : MonoBehaviour
     public float maxY = 20;
 
     private ObjectTracker objectTracker;
-    private AI_behaviour creature;
 
     void Awake()
     {
         objectTracker = FindObjectOfType<ObjectTracker>();
-        creature = GetComponent<AI_behaviour>();
     }
 
     public void Move(float LR, float FB)
@@ -31,23 +29,21 @@ public class Movement : MonoBehaviour
         LR = Mathf.Clamp(LR, -1, 1);
 
 
-        if (!creature.isDead)
-        {
-            // Rotate around z-axis 
-            transform.Rotate(0, 0, LR * rotateSpeed * Time.deltaTime);
 
-            // Move forward / backward 
-            Vector3 movement = transform.right * FB * speed * Time.deltaTime;
+        // Rotate around z-axis 
+        transform.Rotate(0, 0, LR * rotateSpeed * Time.deltaTime);
 
-            // Calculate the potential new position
-            Vector3 newPosition = transform.position + (Vector3)movement;
+        // Move forward / backward 
+        Vector3 movement = transform.right * FB * speed * Time.deltaTime;
 
-            // Clamp the new position within boundaries
-            float clampedX = Mathf.Clamp(newPosition.x, minX, maxX);
-            float clampedY = Mathf.Clamp(newPosition.y, minY, maxY);
+        // Calculate the potential new position
+        Vector3 newPosition = transform.position + (Vector3)movement;
 
-            // Update the position if within boundaries
-            transform.position = new Vector3(clampedX, clampedY, transform.position.z);
-        }
+        // Clamp the new position within boundaries
+        float clampedX = Mathf.Clamp(newPosition.x, minX, maxX);
+        float clampedY = Mathf.Clamp(newPosition.y, minY, maxY);
+
+        // Update the position if within boundaries
+        transform.position = new Vector3(clampedX, clampedY, transform.position.z);
     }
 }

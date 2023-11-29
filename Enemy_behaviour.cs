@@ -96,6 +96,7 @@ public class Enemy_behaviour : MonoBehaviour
         FB = outputsFromNN[0];
         LR = outputsFromNN[1];
         KILL = outputsFromNN[2];
+        KILL = Mathf.Clamp(KILL, 0, 1);
 
         movement.Move(FB, LR);
     }

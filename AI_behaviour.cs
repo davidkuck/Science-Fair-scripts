@@ -234,6 +234,10 @@ public class AI_behaviour : MonoBehaviour
                         this.transform.position.y + Random.Range(-10, 11),
                         0), Quaternion.identity);
 
+                                
+                    //copy the parent's neural network to the child
+                    child.GetComponent<NN>().layers = GetComponent<NN>().copyLayers();
+
                 }
                 else
                 {
